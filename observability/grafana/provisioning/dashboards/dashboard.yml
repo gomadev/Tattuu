@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: tatt-oo
+    orgId: 1
+    folder: Tatt-oo
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

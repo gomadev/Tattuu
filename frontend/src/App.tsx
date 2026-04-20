@@ -1,12 +1,15 @@
-import { Header } from './components/Header';
-import { HomePage } from './pages/HomePage';
+import { BrowserRouter } from 'react-router-dom';
+
+import { OnboardingProvider } from './navigation/OnboardingContext';
+import { AppRoutes } from './navigation/AppRoutes';
 
 function App() {
   return (
-    <>
-      <Header />
-      <HomePage />
-    </>
+    <OnboardingProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </OnboardingProvider>
   );
 }
 

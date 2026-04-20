@@ -1,0 +1,63 @@
+{
+  "uid": "tatt-oo-overview",
+  "title": "Tatt-oo Overview",
+  "tags": ["tatt-oo", "observability"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "HTTP Requests Total",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "sum by (route, status_code) (rate(http_requests_total[1m]))",
+          "legendFormat": "{{route}} - {{status_code}}"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "Prometheus" }
+    },
+    {
+      "type": "timeseries",
+      "title": "API Latency p95",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le, route) (rate(http_request_duration_seconds_bucket[5m])))",
+          "legendFormat": "{{route}}"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "Prometheus" }
+    },
+    {
+      "type": "timeseries",
+      "title": "Backend CPU",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{name=~\"tatt-oo-backend.*\"}[1m]))",
+          "legendFormat": "backend cpu"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "Prometheus" }
+    },
+    {
+      "type": "timeseries",
+      "title": "Backend Memory",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "container_memory_usage_bytes{name=~\"tatt-oo-backend.*\"}",
+          "legendFormat": "backend memory"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "Prometheus" }
+    }
+  ]
+}

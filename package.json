@@ -10,7 +10,10 @@
     "dev:frontend": "npm run dev -w frontend",
     "dev:backend": "npm run dev -w backend",
     "build": "npm run build -w frontend && npm run build -w backend",
-    "start": "npm run start -w backend"
+    "start": "npm run start -w backend",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down -v",
+    "docker:logs": "docker compose logs -f --tail=100"
   },
   "engines": {
     "node": ">=20"
