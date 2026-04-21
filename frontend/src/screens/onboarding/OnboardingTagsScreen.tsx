@@ -31,6 +31,9 @@ export function OnboardingTagsScreen() {
       ]}
       footerLabel="Tudo certo, esses são seus estilos?"
       onNext={() => navigate('/artist/onboarding/payment')}
+      asideTitle="Etapa 5 de 6"
+      asideText="Os estilos ajudam a fazer a busca e a recomendação funcionarem melhor."
+      asideItems={['Seleção múltipla', 'Preferências do artista', 'Tags de descoberta']}
     >
       <div className="chip-grid">
         {styleOptions.map((style) => (

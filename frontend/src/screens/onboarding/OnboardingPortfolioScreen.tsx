@@ -25,6 +25,9 @@ export function OnboardingPortfolioScreen() {
       subtitle="Se a tattoo é linda, deixa a gente ver também."
       footerLabel="Tudo certo, esse é seu portfólio?"
       onNext={() => navigate('/artist/onboarding/tags')}
+      asideTitle="Etapa 4 de 5"
+      asideText="O grid de imagens funciona melhor quando há respiro visual e organização em desktop."
+      asideItems={['Upload em grade', 'Preview imediato', 'Portfólio visual']}
     >
       <div className="portfolio-grid">
         {portfolio.map((item, index) => (

@@ -17,6 +17,9 @@ export function OnboardingNameScreen() {
       ]}
       footerLabel="Próximo"
       onNext={() => navigate('/artist/onboarding/bio')}
+      asideTitle="Etapa 1 de 5"
+      asideText="Um layout web ajuda a distribuir a informação de forma mais confortável em telas grandes."
+      asideItems={['Cadastro guiado', 'Campos com feedback', 'Pronto para desktop']}
       footerExtra={<span className="counter">{data.fullName.length}/{MAX_NAME_LENGTH}</span>}
     >
       <input

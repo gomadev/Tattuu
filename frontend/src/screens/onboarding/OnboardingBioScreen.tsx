@@ -20,6 +20,9 @@ export function OnboardingBioScreen() {
       ]}
       footerLabel="Próximo"
       onNext={() => navigate('/artist/onboarding/location')}
+      asideTitle="Etapa 2 de 5"
+      asideText="Use a bio para destacar experiência, técnica e personalidade."
+      asideItems={['Tom autoral', 'Experiência prática', 'Diferencial do estúdio']}
     >
       <textarea
         className="text-area"

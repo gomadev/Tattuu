@@ -6,10 +6,10 @@ export function RoleSelectorScreen() {
   return (
     <main className="screen screen--dark screen--center gap-lg">
       <button type="button" className="image-button" onClick={() => navigate('/client/artists')}>
-        <img src="/buttons_cliente.png" alt="Quero me Tatuar" />
+        <img src="/quero_tatuar.png" alt="Quero me Tatuar" />
       </button>
       <button type="button" className="image-button" onClick={() => navigate('/artist/splash')}>
-        <img src="/buttons_tatuador.png" alt="Sou Tatuador" />
+        <img src="/sou_tatuador.png" alt="Sou Tatuador" />
       </button>
     </main>
   );

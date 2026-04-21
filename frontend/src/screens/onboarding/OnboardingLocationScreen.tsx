@@ -19,6 +19,9 @@ export function OnboardingLocationScreen() {
       subtitle="Você só precisa informar sua base principal, mas pode receber clientes de qualquer forma."
       footerLabel="Próximo"
       onNext={() => navigate('/artist/onboarding/portfolio')}
+      asideTitle="Etapa 3 de 5"
+      asideText="Informar localização ajuda a segmentar melhor o atendimento e a busca local."
+      asideItems={['Cidade', 'Bairro', 'Abrangência de atendimento']}
     >
       <div className="field-column">
         <input

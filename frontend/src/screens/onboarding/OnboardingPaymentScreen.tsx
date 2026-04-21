@@ -27,6 +27,9 @@ export function OnboardingPaymentScreen() {
       ]}
       footerLabel="Finalizar"
       onNext={finishOnboarding}
+      asideTitle="Última etapa"
+      asideText="Aqui você fecha o cadastro com a regra de cobrança e observações adicionais."
+      asideItems={['Por hora', 'Por peça', 'A combinar']}
     >
       <div className="payment-grid">
         {paymentOptions.map((option) => (

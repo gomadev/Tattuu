@@ -17,12 +17,13 @@ body {
 
 .screen {
   min-height: 100dvh;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .screen--dark {
-  background: var(--background-dark);
+  background: #000;
   color: #fff;
 }
 
@@ -36,12 +37,233 @@ body {
   justify-content: center;
 }
 
+.page-frame {
+  width: min(1200px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1.5rem 0;
+}
+
+.client-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.client-sidebar {
+  position: sticky;
+  top: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.client-sidebar-card,
+.client-panel,
+.client-toolbar,
+.artist-card,
+.onboarding-panel,
+.onboarding-aside {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 32px rgba(34, 21, 58, 0.06);
+}
+
+.client-sidebar-card,
+.client-panel,
+.client-toolbar,
+.artist-card,
+.onboarding-panel,
+.onboarding-aside {
+  padding: 1rem;
+}
+
+.client-sidebar-card h2,
+.client-panel h2,
+.onboarding-aside h3 {
+  margin: 0 0 0.5rem;
+}
+
+.client-sidebar-card p,
+.client-panel p,
+.onboarding-aside p,
+.onboarding-aside li {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.client-sidebar-actions {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.client-main {
+  display: grid;
+  gap: 1rem;
+}
+
+.client-toolbar {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.client-toolbar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.client-toolbar-title {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.client-toolbar-title strong {
+  font-size: 1.1rem;
+}
+
+.client-toolbar-title span {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
 .gap-lg {
   gap: 1.25rem;
 }
 
 .logo-splash {
-  width: min(68vw, 260px);
+  width: min(56vw, 220px);
+  position: relative;
+  z-index: 2;
+}
+
+.splash-screen {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.splash-canvas {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  z-index: 0;
+}
+
+.splash-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 24%, transparent 58%),
+    radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.55) 100%);
+  z-index: 0;
+}
+
+.tattoo-stroke {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.16));
+}
+
+.tattoo-stroke-primary,
+.tattoo-stroke-secondary {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+}
+
+.tattoo-stroke-primary {
+  stroke: rgba(245, 245, 245, 0.48);
+  stroke-width: 2.2;
+  stroke-dasharray: 1450;
+  stroke-dashoffset: 1450;
+  animation: tattoo-draw-primary 4.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.tattoo-stroke-secondary {
+  stroke: rgba(245, 245, 245, 0.26);
+  stroke-width: 1.35;
+  stroke-dasharray: 1450;
+  stroke-dashoffset: 1450;
+  animation: tattoo-draw-secondary 4.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.tattoo-stroke-primary--one { animation-delay: 0s; }
+.tattoo-stroke-primary--two { animation-delay: 0.55s; }
+.tattoo-stroke-primary--three { animation-delay: 1.1s; }
+.tattoo-stroke-secondary--one { animation-delay: 0.2s; }
+.tattoo-stroke-secondary--two { animation-delay: 0.8s; }
+.tattoo-stroke-secondary--three { animation-delay: 1.2s; }
+.tattoo-stroke-secondary--four { animation-delay: 1.65s; }
+
+.splash-brand {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: min(90vw, 520px);
+  pointer-events: none;
+}
+
+.splash-loading {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.tattoo-needle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  margin-top: -5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.5);
+  z-index: 2;
+  animation: tattoo-needle-travel 4.2s ease-in-out infinite;
+}
+
+.splash-spinner {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.26);
+  border-top-color: #fff;
+  animation: splash-spin 0.9s linear infinite;
+}
+
+@keyframes splash-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes tattoo-draw-primary {
+  0% { stroke-dashoffset: 1450; opacity: 0; }
+  12% { opacity: 0.3; }
+  62% { stroke-dashoffset: 0; opacity: 0.95; }
+  100% { stroke-dashoffset: -180; opacity: 0; }
+}
+
+@keyframes tattoo-draw-secondary {
+  0% { stroke-dashoffset: 1450; opacity: 0; }
+  16% { opacity: 0.2; }
+  70% { stroke-dashoffset: 0; opacity: 0.78; }
+  100% { stroke-dashoffset: -150; opacity: 0; }
 }
 
 .image-button {
@@ -57,17 +279,16 @@ body {
 }
 
 .list-header {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--background-light);
-  padding: 1.25rem 1rem 0.75rem;
-  border-bottom: 1px solid var(--border);
+  display: grid;
+  gap: 1rem;
+}
+
+.list-header--compact {
+  padding: 1rem 0 0;
 }
 
 .logo-top {
   width: 130px;
-  margin-bottom: 0.75rem;
 }
 
 .search-wrap {
@@ -96,16 +317,9 @@ body {
 }
 
 .list-content {
-  padding: 1rem;
   display: grid;
   gap: 0.9rem;
-}
-
-.artist-card {
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0.95rem;
-  background: #fff;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .artist-card h3 {
@@ -157,9 +371,7 @@ body {
 }
 
 .screen-footer-row {
-  margin-top: auto;
-  border-top: 1px solid var(--border);
-  padding: 0.85rem 1rem 1rem;
+  margin-top: 0.25rem;
   display: flex;
   gap: 0.6rem;
 }
@@ -186,21 +398,21 @@ body {
 }
 
 .empty-screen {
-  justify-content: space-between;
+  padding-bottom: 1.5rem;
 }
 
 .empty-state {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 1;
-  padding: 1.5rem;
+  min-height: 260px;
+  padding: 2rem 1rem;
   text-align: center;
   color: var(--text-muted);
 }
 
 .empty-footer {
-  padding: 1rem;
+  padding: 1.25rem 0 0;
   display: grid;
   gap: 0.8rem;
 }
@@ -216,15 +428,43 @@ body {
   background: var(--background-light);
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  padding: 1.5rem 0;
 }
 
 .onboarding-content {
-  padding: 1.35rem 1rem 1rem;
+  width: min(920px, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+.onboarding-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 320px);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.onboarding-panel,
+.onboarding-aside {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 10px 32px rgba(34, 21, 58, 0.06);
+}
+
+.onboarding-panel {
+  padding: 1.35rem;
+}
+
+.onboarding-aside {
+  padding: 1.25rem;
+  position: sticky;
+  top: 1.5rem;
 }
 
 .onboarding-content h1 {
   margin: 0;
-  font-size: clamp(1.35rem, 2.8vw, 1.85rem);
+  font-size: clamp(1.55rem, 2.8vw, 2.15rem);
   line-height: 1.25;
 }
 
@@ -266,8 +506,8 @@ body {
 
 .portfolio-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
 }
 
 .portfolio-item {
@@ -292,7 +532,8 @@ body {
 
 .payment-grid {
   display: grid;
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
 }
 
 .payment-card {
@@ -324,12 +565,30 @@ body {
   color: var(--text-muted);
 }
 
-@media (min-width: 768px) {
-  .screen,
-  .onboarding-screen {
-    max-width: 480px;
-    margin: 0 auto;
-    border-left: 1px solid var(--border);
-    border-right: 1px solid var(--border);
+@media (max-width: 920px) {
+  .client-layout,
+  .onboarding-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .client-sidebar,
+  .onboarding-aside {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-frame,
+  .onboarding-content {
+    width: calc(100% - 1rem);
+  }
+
+  .client-toolbar-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .screen-footer-row {
+    flex-direction: column;
   }
 }
