@@ -3,12 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { OnboardingLayout } from '../../components/OnboardingLayout';
 import { useOnboarding } from '../../navigation/OnboardingContext';
 
-const paymentOptions = [
-  { id: 'por-hora', label: 'Por hora' },
-  { id: 'por-peca', label: 'Por peça' },
-  { id: 'a-combinar', label: 'A combinar' },
-] as const;
-
 export function OnboardingPaymentScreen() {
   const { data, updateData, resetData } = useOnboarding();
   const navigate = useNavigate();
@@ -22,34 +16,15 @@ export function OnboardingPaymentScreen() {
     <OnboardingLayout
       titleParts={[
         { text: 'Como você ' },
-        { text: 'cobra', highlight: true },
-        { text: ' pelo seu trabalho?' },
+        { text: 'cobra ', highlight: true },
+        { text: 'pelo seu trabalho?' },
       ]}
+      subtitleInputValue={data.pricingNotes}
+      subtitleInputPlaceholder="Pix não dói. A tatuagem talvez.."
+      subtitleInputAriaLabel="Informações de pagamento"
+      onSubtitleInputChange={(value) => updateData({ pricingNotes: value })}
       footerLabel="Finalizar"
       onNext={finishOnboarding}
-      asideTitle="Última etapa"
-      asideText="Aqui você fecha o cadastro com a regra de cobrança e observações adicionais."
-      asideItems={['Por hora', 'Por peça', 'A combinar']}
-    >
-      <div className="payment-grid">
-        {paymentOptions.map((option) => (
-          <button
-            type="button"
-            key={option.id}
-            className={`payment-card ${data.pricingModel === option.id ? 'payment-card--active' : ''}`}
-            onClick={() => updateData({ pricingModel: option.id })}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-
-      <textarea
-        className="text-area"
-        value={data.pricingNotes}
-        placeholder="Informações adicionais (opcional)"
-        onChange={(event) => updateData({ pricingNotes: event.target.value })}
-      />
-    </OnboardingLayout>
+    />
   );
 }

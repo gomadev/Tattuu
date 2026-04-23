@@ -6,6 +6,12 @@ import { useOnboarding } from '../../navigation/OnboardingContext';
 export function OnboardingLocationScreen() {
   const { data, updateData } = useOnboarding();
   const navigate = useNavigate();
+  const locationValue = [data.city, data.neighborhood].filter(Boolean).join(' - ');
+
+  function handleLocationChange(value: string) {
+    const [city = '', neighborhood = ''] = value.split('-').map((part) => part.trim());
+    updateData({ city, neighborhood });
+  }
 
   return (
     <OnboardingLayout
@@ -16,27 +22,12 @@ export function OnboardingLocationScreen() {
         { text: 'bairro', highlight: true },
         { text: ' onde você atende.' },
       ]}
-      subtitle="Você só precisa informar sua base principal, mas pode receber clientes de qualquer forma."
+      subtitleInputValue={locationValue}
+      subtitleInputPlaceholder="Pode colocar certinho… mas vão pedir no WhatsApp de qualquer forma."
+      subtitleInputAriaLabel="Cidade e bairro"
+      onSubtitleInputChange={handleLocationChange}
       footerLabel="Próximo"
       onNext={() => navigate('/artist/onboarding/portfolio')}
-      asideTitle="Etapa 3 de 5"
-      asideText="Informar localização ajuda a segmentar melhor o atendimento e a busca local."
-      asideItems={['Cidade', 'Bairro', 'Abrangência de atendimento']}
-    >
-      <div className="field-column">
-        <input
-          className="text-input"
-          value={data.city}
-          placeholder="Cidade"
-          onChange={(event) => updateData({ city: event.target.value })}
-        />
-        <input
-          className="text-input"
-          value={data.neighborhood}
-          placeholder="Bairro"
-          onChange={(event) => updateData({ neighborhood: event.target.value })}
-        />
-      </div>
-    </OnboardingLayout>
+    />
   );
 }

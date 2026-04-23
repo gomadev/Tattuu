@@ -3,6 +3,9 @@ export interface ArtistProfile {
   name: string;
   profileUrl: string;
   shortDescription: string;
+  portfolioImage?: string;
+  handle?: string;
+  bio: string;
   styles: string[];
 }
 

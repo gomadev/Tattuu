@@ -9,26 +9,28 @@ export function OnboardingNameScreen() {
   const { data, updateData } = useOnboarding();
   const navigate = useNavigate();
 
+  function handleNext() {
+    if (!data.fullName.trim()) {
+      return;
+    }
+
+    navigate('/artist/onboarding/bio');
+  }
+
   return (
     <OnboardingLayout
       titleParts={[
         { text: 'Conte-nos um pouco ' },
-        { text: 'sobre você', highlight: true },
+        { text: 'sobre você!', highlight: true },
       ]}
+      subtitleInputValue={data.fullName}
+      subtitleInputPlaceholder="Seu nome artístico..."
+      subtitleInputMaxLength={MAX_NAME_LENGTH}
+      subtitleInputAriaLabel="Nome artístico"
+      onSubtitleInputChange={(value) => updateData({ fullName: value })}
       footerLabel="Próximo"
-      onNext={() => navigate('/artist/onboarding/bio')}
-      asideTitle="Etapa 1 de 5"
-      asideText="Um layout web ajuda a distribuir a informação de forma mais confortável em telas grandes."
-      asideItems={['Cadastro guiado', 'Campos com feedback', 'Pronto para desktop']}
+      onNext={handleNext}
       footerExtra={<span className="counter">{data.fullName.length}/{MAX_NAME_LENGTH}</span>}
-    >
-      <input
-        className="text-input"
-        value={data.fullName}
-        maxLength={MAX_NAME_LENGTH}
-        placeholder="Nome completo"
-        onChange={(event) => updateData({ fullName: event.target.value })}
-      />
-    </OnboardingLayout>
+    />
   );
 }

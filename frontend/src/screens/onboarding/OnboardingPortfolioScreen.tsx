@@ -7,9 +7,8 @@ export function OnboardingPortfolioScreen() {
   const { data, updateData } = useOnboarding();
   const navigate = useNavigate();
 
-  const portfolio = Array.from({ length: 4 }).map((_, index) => data.portfolioImages[index] ?? '');
-
-  function addPlaceholderImage(index: number) {
+  function addPlaceholderImage() {
+    const index = data.portfolioImages.length;
     const next = [...data.portfolioImages];
     next[index] = `/resumo.png?slot=${index}`;
     updateData({ portfolioImages: next });
@@ -18,28 +17,23 @@ export function OnboardingPortfolioScreen() {
   return (
     <OnboardingLayout
       titleParts={[
-        { text: 'Agora é hora de deixar a ' },
-        { text: 'agulha', highlight: true },
-        { text: ' falar.' },
+        { text: 'Upload de ' },
+        { text: 'fotos', highlight: true },
+        { text: ' do seu trabalho' },
       ]}
       subtitle="Se a tattoo é linda, deixa a gente ver também."
       footerLabel="Tudo certo, esse é seu portfólio?"
       onNext={() => navigate('/artist/onboarding/tags')}
-      asideTitle="Etapa 4 de 5"
-      asideText="O grid de imagens funciona melhor quando há respiro visual e organização em desktop."
-      asideItems={['Upload em grade', 'Preview imediato', 'Portfólio visual']}
     >
-      <div className="portfolio-grid">
-        {portfolio.map((item, index) => (
-          <button
-            type="button"
-            key={index}
-            className="portfolio-item"
-            onClick={() => addPlaceholderImage(index)}
-          >
-            {item ? <img src={item} alt={`Portfólio ${index + 1}`} /> : <span>+ Adicionar</span>}
-          </button>
-        ))}
+      <div className="portfolio-stage">
+        <button
+          type="button"
+          className="portfolio-add-button"
+          onClick={addPlaceholderImage}
+          aria-label="Adicionar foto ao portfólio"
+        >
+          +
+        </button>
       </div>
     </OnboardingLayout>
   );

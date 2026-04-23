@@ -8,6 +8,12 @@ interface HighlightPart {
 interface OnboardingLayoutProps {
   titleParts: HighlightPart[];
   subtitle?: string;
+  subtitleInputValue?: string;
+  subtitleInputPlaceholder?: string;
+  subtitleInputMaxLength?: number;
+  subtitleInputMultiline?: boolean;
+  subtitleInputAriaLabel?: string;
+  onSubtitleInputChange?: (value: string) => void;
   footerLabel: string;
   onNext?: () => void;
   footerExtra?: ReactNode;
@@ -19,50 +25,61 @@ interface OnboardingLayoutProps {
 export function OnboardingLayout({
   titleParts,
   subtitle,
+  subtitleInputValue,
+  subtitleInputPlaceholder,
+  subtitleInputMaxLength,
+  subtitleInputMultiline,
+  subtitleInputAriaLabel,
+  onSubtitleInputChange,
   footerLabel,
   onNext,
   footerExtra,
-  asideTitle,
-  asideText,
-  asideItems,
   children,
 }: PropsWithChildren<OnboardingLayoutProps>) {
-  return (
-    <main className="onboarding-screen">
-      <section className="onboarding-content">
-        <div className="onboarding-shell">
-          <div className="onboarding-panel">
-            <h1>
-              {titleParts.map((part, index) => (
-                <span key={`${part.text}-${index}`} className={part.highlight ? 'text-highlight' : ''}>
-                  {part.text}
-                </span>
-              ))}
-            </h1>
-            {subtitle ? <p className="onboarding-subtitle">{subtitle}</p> : null}
-            <div className="onboarding-body">{children}</div>
-            <footer className="onboarding-footer">
-              {footerExtra}
-              <button type="button" className="primary-button" onClick={onNext}>
-                {footerLabel}
-              </button>
-            </footer>
-          </div>
+  const hasSubtitleInput = typeof onSubtitleInputChange === 'function';
 
-          <aside className="onboarding-aside">
-            <h3>{asideTitle ?? 'Resumo da etapa'}</h3>
-            <p>
-              {asideText ?? 'Preencha os dados ao lado para avançar no cadastro do tatuador.'}
-            </p>
-            {asideItems?.length ? (
-              <ul>
-                {asideItems.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            ) : null}
-          </aside>
-        </div>
+  return (
+    <main className="onboarding-screen onboarding-flow-screen">
+      <section className="onboarding-flow-content">
+        <h1>
+          {titleParts.map((part, index) => (
+            <span key={`${part.text}-${index}`} className={part.highlight ? 'text-highlight' : ''}>
+              {part.text}
+            </span>
+          ))}
+        </h1>
+        {hasSubtitleInput ? (
+          subtitleInputMultiline ? (
+            <textarea
+              className="onboarding-subtitle onboarding-subtitle-input onboarding-subtitle-input--multiline"
+              value={subtitleInputValue ?? ''}
+              maxLength={subtitleInputMaxLength}
+              placeholder={subtitleInputPlaceholder}
+              aria-label={subtitleInputAriaLabel ?? subtitleInputPlaceholder ?? 'Digite aqui'}
+              onChange={(event) => onSubtitleInputChange(event.target.value)}
+            />
+          ) : (
+            <input
+              className="onboarding-subtitle onboarding-subtitle-input"
+              value={subtitleInputValue ?? ''}
+              maxLength={subtitleInputMaxLength}
+              placeholder={subtitleInputPlaceholder}
+              aria-label={subtitleInputAriaLabel ?? subtitleInputPlaceholder ?? 'Digite aqui'}
+              onChange={(event) => onSubtitleInputChange(event.target.value)}
+            />
+          )
+        ) : subtitle ? (
+          <p className="onboarding-subtitle">{subtitle}</p>
+        ) : null}
+
+        <div className="onboarding-body">{children}</div>
+
+        <footer className="onboarding-footer onboarding-footer--minimal">
+          {footerExtra}
+          <button type="button" className="primary-button onboarding-flow-next" onClick={onNext}>
+            {footerLabel}
+          </button>
+        </footer>
       </section>
     </main>
   );

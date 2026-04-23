@@ -18,18 +18,14 @@ export function OnboardingBioScreen() {
         { text: 'único', highlight: true },
         { text: '.' },
       ]}
+      subtitleInputValue={data.bio}
+      subtitleInputPlaceholder="Só 300 caracteres, mas relaxa... depois dá pra cobrir."
+      subtitleInputMaxLength={300}
+      subtitleInputMultiline
+      subtitleInputAriaLabel="Bio do artista"
+      onSubtitleInputChange={(value) => updateData({ bio: value })}
       footerLabel="Próximo"
       onNext={() => navigate('/artist/onboarding/location')}
-      asideTitle="Etapa 2 de 5"
-      asideText="Use a bio para destacar experiência, técnica e personalidade."
-      asideItems={['Tom autoral', 'Experiência prática', 'Diferencial do estúdio']}
-    >
-      <textarea
-        className="text-area"
-        value={data.bio}
-        placeholder="Fale sobre seu estilo e experiência"
-        onChange={(event) => updateData({ bio: event.target.value })}
-      />
-    </OnboardingLayout>
+    />
   );
 }

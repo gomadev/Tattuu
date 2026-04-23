@@ -61,27 +61,7 @@ export function SplashScreen() {
 
   return (
     <main className="screen screen--dark splash-screen">
-      <div className="splash-canvas" aria-hidden="true">
-        <div className="splash-vignette" />
-        <svg className="tattoo-stroke" viewBox="0 0 1000 1000" preserveAspectRatio="none">
-          <path className="tattoo-stroke-primary tattoo-stroke-primary--one" d="M-80 160 C 130 -30, 330 320, 560 150 S 880 -20, 1120 180" />
-          <path className="tattoo-stroke-primary tattoo-stroke-primary--two" d="M-100 500 C 120 310, 310 720, 570 500 S 910 290, 1130 530" />
-          <path className="tattoo-stroke-primary tattoo-stroke-primary--three" d="M-80 860 C 140 650, 330 1040, 590 850 S 900 660, 1120 860" />
-          <path className="tattoo-stroke-secondary tattoo-stroke-secondary--one" d="M20 80 C 230 230, 430 -20, 640 130 S 910 240, 1080 80" />
-          <path className="tattoo-stroke-secondary tattoo-stroke-secondary--two" d="M-40 310 C 180 220, 360 430, 580 320 S 900 210, 1120 320" />
-          <path className="tattoo-stroke-secondary tattoo-stroke-secondary--three" d="M0 690 C 220 560, 400 850, 640 700 S 930 560, 1140 700" />
-          <path className="tattoo-stroke-secondary tattoo-stroke-secondary--four" d="M110 940 C 320 790, 520 1050, 730 920 S 960 780, 1120 940" />
-        </svg>
-      </div>
-
-      <div className="splash-brand">
-        <img src="/tattoo_logo_dark.png" alt="Tattoo" className="logo-splash" />
-      </div>
-
-      <div className="splash-loading" aria-live="polite" aria-label="Carregando">
-        <span className="splash-spinner" />
-      </div>
-
+      <img src="/tattoo_logo_dark.png" alt="Tattoo" className="logo-splash" />
       <audio ref={audioRef} src="/tattoo_machine.mp3" autoPlay loop preload="auto" />
     </main>
   );

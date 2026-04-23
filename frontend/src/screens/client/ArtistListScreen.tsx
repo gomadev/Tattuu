@@ -1,86 +1,201 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { ArtistCard } from '../../components/ArtistCard';
-import { Chip } from '../../components/Chip';
-import { SearchBar } from '../../components/SearchBar';
 import { artistsMock } from '../../data/artists';
+import './ArtistListScreen.css';
 
-const highlights = ['Blackwork', 'Realismo', 'Fineline', 'Aquarela'];
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+function ArtistCard({ artist }: { artist: (typeof artistsMock)[0] }) {
+  const ini = getInitials(artist.name);
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    el.style.transform = `translateY(-5px) rotateY(${x * 10}deg) rotateX(${-y * 8}deg) scale(1.02)`;
+  }
+
+  function handleMouseLeave(e: React.MouseEvent<HTMLDivElement>) {
+    e.currentTarget.style.transform = '';
+  }
+
+  return (
+    <div
+      className="artist-card"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="card-top-glow" />
+
+      <div className="card-img">
+        <div className="card-img-inner">
+          <div className="img-ring2" />
+          <div className="img-ring" />
+          <div className="img-initials">{ini}</div>
+        </div>
+      </div>
+
+      <div className="card-body">
+        <div className="card-identity">
+          <div className="avatar">{ini}</div>
+          <div>
+            <div className="card-name">{artist.name}</div>
+            <div className="card-handle">{artist.handle ?? `@${artist.name.toLowerCase().replace(' ', '.')}`}</div>
+          </div>
+        </div>
+
+        <div className="card-bio">{artist.bio}</div>
+
+        <div className="card-tags">
+          {artist.styles.map((s) => (
+            <span key={s} className="tag">
+              {s}
+            </span>
+          ))}
+        </div>
+
+        <button type="button" className="card-cta">
+          Ver perfil completo →
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export function ArtistListScreen() {
-  const [search, setSearch] = useState('');
+  const [tagQuery, setTagQuery] = useState('');
   const navigate = useNavigate();
 
   const artists = useMemo(() => {
-    const query = search.toLowerCase().trim();
+    const query = tagQuery.trim().toLowerCase();
+
     if (!query) {
       return artistsMock;
     }
 
     return artistsMock.filter((artist) => {
-      return (
-        artist.name.toLowerCase().includes(query) ||
-        artist.shortDescription.toLowerCase().includes(query) ||
-        artist.styles.some((style) => style.toLowerCase().includes(query))
-      );
+      return artist.styles.some((style) => style.toLowerCase().includes(query));
     });
-  }, [search]);
+  }, [tagQuery]);
 
   return (
-    <main className="screen screen--light">
-      <div className="page-frame">
-        <div className="client-layout">
-          <aside className="client-sidebar">
-            <div className="client-sidebar-card">
-              <img src="/tattoo_logo_light.png" alt="Tattoo" className="logo-top" />
-              <h2>Encontrar tatuadores por estilo</h2>
-              <p>
-                Uma vitrine web com busca, filtros e cards em grade para destacar profissionais.
-              </p>
-            </div>
+    <>
+      <div className="pg">
+        <div className="orb orb1" />
+        <div className="orb orb2" />
+        <div className="orb orb3" />
 
-            <div className="client-sidebar-card">
-              <h2>Atalhos</h2>
-              <div className="client-sidebar-actions">
-                <button type="button" className="secondary-button" onClick={() => navigate('/client/filtered')}>
-                  Ver versão filtrada
-                </button>
-                <button type="button" className="secondary-button" onClick={() => navigate('/client/empty')}>
-                  Simular sem resultados
-                </button>
+        <nav className="navbar">
+          <div className="logo">
+            <em>T</em>attoo
+          </div>
+          <div className="nav-pill">Descobrir artistas</div>
+        </nav>
+
+        <div className="layout">
+          <aside className="sidebar">
+            <div>
+              <div className="s-label">Tags</div>
+              <div className="tag-search">
+                <input
+                  type="text"
+                  value={tagQuery}
+                  onChange={(event) => setTagQuery(event.target.value)}
+                  placeholder="Buscar tag, ex: blackwork"
+                  aria-label="Buscar tags"
+                />
+                {tagQuery && (
+                  <button type="button" onClick={() => setTagQuery('')}>
+                    Limpar
+                  </button>
+                )}
+              </div>
+              <p className="tag-search-hint">
+                Filtre os artistas pelas tags dos estilos.
+              </p>
+              <div className="chips chips--muted">
+                {artistsMock
+                  .flatMap((artist) => artist.styles)
+                  .filter((style, index, all) => all.indexOf(style) === index)
+                  .filter((style) => style.toLowerCase().includes(tagQuery.toLowerCase().trim()))
+                  .map((style) => (
+                    <span key={style} className="chip chip--static">
+                      {style}
+                    </span>
+                  ))}
               </div>
             </div>
 
-            <div className="client-sidebar-card">
-              <h2>Estilos em destaque</h2>
-              <div className="chip-row">
-                {highlights.map((style) => (
-                  <Chip key={style} label={style} />
-                ))}
+            <div>
+              <div className="s-label">Navegação</div>
+              <div className="nav-links">
+                <button
+                  type="button"
+                  className="nlink"
+                  onClick={() => navigate('/client/filtered')}
+                >
+                  Ver filtrados
+                </button>
+                <button
+                  type="button"
+                  className="nlink"
+                  onClick={() => navigate('/client/empty')}
+                >
+                  Simular vazio
+                </button>
               </div>
             </div>
           </aside>
 
-          <section className="client-main">
-            <div className="client-toolbar">
-              <div className="client-toolbar-head">
-                <div className="client-toolbar-title">
-                  <strong>Artistas disponíveis</strong>
-                  <span>{artists.length} resultado(s) encontrado(s)</span>
-                </div>
+          <main className="main">
+            <div className="topbar">
+              <div className="cnt">
+                <b>
+                  {artists.length} artista{artists.length !== 1 ? 's' : ''}
+                </b>{' '}
+                encontrado{artists.length !== 1 ? 's' : ''}
+                {tagQuery && ` com tag "${tagQuery}"`}
               </div>
-              <SearchBar value={search} placeholder="Busque por nome ou estilo" onChange={setSearch} />
+
+              {tagQuery && (
+                <span className="ftag">
+                  {tagQuery}
+                  <button type="button" onClick={() => setTagQuery('')}>
+                    ×
+                  </button>
+                </span>
+              )}
             </div>
 
-            <section className="list-content">
-              {artists.map((artist) => (
-                <ArtistCard key={artist.id} artist={artist} />
-              ))}
-            </section>
-          </section>
+            <div className="grid">
+              {artists.length > 0 ? (
+                artists.map((artist) => (
+                  <ArtistCard key={artist.id} artist={artist} />
+                ))
+              ) : (
+                <div className="no-results">
+                  <p>Nenhum artista encontrado</p>
+                  <button
+                    type="button"
+                    onClick={() => setTagQuery('')}
+                  >
+                    Limpar filtros
+                  </button>
+                </div>
+              )}
+            </div>
+          </main>
         </div>
       </div>
-    </main>
+    </>
   );
 }
