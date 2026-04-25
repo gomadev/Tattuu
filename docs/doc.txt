@@ -1,0 +1,390 @@
+
+Projeto de Arquitetura de Dados — Tattuu
+
+4.1. Descrição do Projeto
+
+Nome do Projeto  
+Tattuu — Plataforma de Descoberta de Tatuadores
+
+Contexto de Negócio  
+O Tattuu é uma plataforma digital desenvolvida para conectar pessoas interessadas em realizar tatuagens a tatuadores profissionais. A aplicação possibilita que usuários encontrem profissionais com base em critérios como estilo, localização, portfólio e avaliações.
+
+Problema  
+Atualmente, os usuários enfrentam desafios significativos para:
+- Encontrar tatuadores qualificados;
+- Comparar estilos e portfólios;
+- Identificar profissionais próximos geograficamente;
+- Tomar decisões fundamentadas em avaliações confiáveis.
+
+Objetivos  
+- Centralizar o cadastro de tatuadores em uma única plataforma;
+- Permitir buscas por estilo e localização;
+- Disponibilizar perfis profissionais completos, incluindo portfólio;
+- Coletar e processar dados para análises e recomendações.
+
+Stakeholders  
+- Usuários finais (clientes)
+- Tatuadores
+- Administradores
+- Equipe de marketing
+- Equipe de produto
+
+
+4.2. Definição e Classificação dos Dados
+
+Dados Utilizados  
+- Cadastro de usuários
+- Cadastro de tatuadores
+- Portfólios (imagens e descrições)
+- Localização
+- Estilos de tatuagem
+- Avaliações e comentários
+- Eventos de interação (buscas, cliques, visualizações)
+
+Classificação dos Dados  
+
+Dados Operacionais (Estruturados):  
+Armazenados em banco relacional, abrangendo usuários, tatuadores, avaliações, estilos e relacionamentos entre entidades.
+
+Detalhamento das Fontes Operacionais:
+- Fonte: Aplicação web e mobile (FastAPI)
+- Formato: JSON (requisições HTTP) e armazenado como registros relacionais
+- Frequência: Contínua (insere/atualiza conforme usuários interagem)
+- Volume estimado: 10 MB/dia em ambiente inicial (escalável)
+- Latência esperada: Imediata (< 1 segundo)
+- Tabelas principais: users, artists, portfolios, ratings, styles
+
+Dados de Streaming (Eventos):  
+Gerados em tempo real, como buscas realizadas, visualizações de perfil, cliques em portfólio e demais interações do usuário.
+
+Detalhamento das Fontes de Streaming:
+- Fonte: Eventos da aplicação (cliques, buscas, visualizações)
+- Formato: JSON estruturado em fila de mensagens (Kafka ou alternativa)
+- Frequência: Contínua (milhares de eventos por hora em pico)
+- Volume estimado: 100 MB/dia (escala com crescimento de usuários)
+- Latência esperada: < 5 segundos do evento à fila
+- Tipos de eventos: search_event, view_event, click_event, profile_update_event
+
+
+4.3. Domínios e Serviços
+
+Domínio Usuários  
+- Cadastro  
+- Login e autenticação
+- Gerenciamento de perfil
+- Histórico de buscas e favoritos
+
+Domínio Tatuadores  
+- Cadastro de profissionais  
+- Upload e gerenciamento de portfólio  
+- Definição de estilos  
+- Localização e disponibilidade
+
+Domínio Busca  
+- Busca por estilo  
+- Busca por localização  
+- Ranking de resultados
+- Filtros avançados
+
+Domínio Analytics  
+- Coleta de métricas  
+- Geração de relatórios  
+- Análise de comportamento
+- Recomendações personalizadas
+
+Diagrama de Domínios e Serviços:
+
+```mermaid
+graph TB
+    subgraph "Plataforma Tattuu"
+        U["Domínio Usuários<br/>- Cadastro<br/>- Autenticação<br/>- Gerenciamento de Perfil"]
+        T["Domínio Tatuadores<br/>- Cadastro Profissional<br/>- Portfólio<br/>- Estilos"]
+        S["Domínio Busca<br/>- Busca por Estilo<br/>- Busca Geolocalizada<br/>- Ranking"]
+        A["Domínio Analytics<br/>- Métricas<br/>- Recomendações<br/>- Relatórios"]
+    end
+    
+    U -->|Dados do Perfil| S
+    T -->|Dados Profissionais| S
+    S -->|Eventos de Busca| A
+    U -->|Eventos de Interação| A
+    T -->|Eventos de Interação| A
+    A -->|Insights| S
+    A -->|Insights| U
+```
+
+Serviços Compartilhados:
+- Autenticação e autorização (OAuth 2.0)
+- Armazenamento de mídia (imagens de portfólio)
+- Notificações (email e push)
+- Logging e monitoramento
+
+
+4.4. Arquitetura e Fluxo de Dados
+
+Arquitetura Adotada  
+Foi escolhida uma arquitetura Lakehouse baseada no modelo Medalhão para combinar os benefícios de um Data Lake (flexibilidade, escalabilidade) com as características de um Data Warehouse (qualidade, governança). Este modelo contempla três camadas:
+- Bronze: dados brutos, ingeridos tal como são gerados
+- Silver: dados limpos, validados e padronizados
+- Gold: dados agregados e otimizados para análise
+
+Justificativa: A arquitetura Lakehouse foi selecionada porque permite ingestão ágil de dados estruturados (operacionais) e não estruturados (eventos), oferecendo escalabilidade horizontal sem sacrificar a qualidade dos dados. Diferencia-se do Data Lake tradicional por impor governança desde a ingestão e do Data Warehouse por permitir flexibilidade nas transformações.
+
+Fluxo de Dados Completo:
+
+```mermaid
+graph LR
+    subgraph "Geração"
+        APP["Aplicação<br/>Web/Mobile"]
+        EVT["Eventos<br/>Usuário"]
+    end
+    
+    subgraph "Ingestão"
+        API["FastAPI<br/>REST"]
+        QUEUE["Kafka/Fila<br/>Mensagens"]
+    end
+    
+    subgraph "Armazenamento"
+        PGDB["PostgreSQL<br/>Dados Operacionais"]
+        BRONZE["Bronze Layer<br/>S3/Local"]
+    end
+    
+    subgraph "Processamento"
+        SILVER["Silver Layer<br/>Spark/Pandas"]
+        TRANSFORM["Transformações<br/>Cleaning & Validation"]
+    end
+    
+    subgraph "Análise"
+        GOLD["Gold Layer<br/>Aggregated Data"]
+        METRICS["Métricas<br/>KPIs"]
+    end
+    
+    subgraph "Consumo"
+        BI["Power BI<br/>Dashboards"]
+        API_CONS["API de Dados<br/>Recomendações"]
+    end
+    
+    APP -->|HTTP| API
+    APP -->|Events| QUEUE
+    API -->|Transações| PGDB
+    QUEUE -->|Raw Events| BRONZE
+    PGDB -->|Batch Export| BRONZE
+    BRONZE -->|Leitura| SILVER
+    SILVER -->|Processamento| TRANSFORM
+    TRANSFORM -->|Escrita| GOLD
+    GOLD -->|Consultas| BI
+    GOLD -->|Dados| API_CONS
+    BI -->|Insights| APP
+    
+    style APP fill:#e1f5ff
+    style PGDB fill:#fff3e0
+    style BRONZE fill:#f3e5f5
+    style SILVER fill:#f3e5f5
+    style GOLD fill:#e8f5e9
+    style BI fill:#fce4ec
+```
+
+Caminhos de Processamento:
+
+**Batch (Operacional → Gold):**
+- Dados do PostgreSQL são exportados diariamente para Bronze
+- Processamento noturno (Silver → Gold) com Spark/Pandas
+- Agregações de métricas e históricos
+
+**Streaming (Eventos → Gold):**
+- Eventos são ingeridos em tempo real pela Kafka
+- Processamento contínuo (janelas de 5 minutos)
+- Atualização de contadores e métricas em tempo real
+
+Análise de Trade-offs:
+
+**Acoplamento vs. Flexibilidade:**
+- Decisão: Arquitetura Medalhão com separação clara de camadas
+- Trade-off: Maior flexibilidade nas transformações, mas requer orquestração robusta
+- Mitigação: Uso de Airflow para gerenciar dependências entre jobs
+
+**Escalabilidade vs. Complexidade:**
+- Decisão: Spark opcional e Pandas como padrão inicial
+- Trade-off: Simplicidade inicial, mas capacidade limitada (100 MB/dia → escalabilidade para GB/dia seria mais complexa)
+- Mitigação: Arquitetura preparada para migração futura para Spark sem refatoração
+
+**Latência vs. Consistência:**
+- Decisão: Caminhos separados para batch e streaming
+- Trade-off: Dados em Gold podem ter latência de 24h (batch) ou 5 min (streaming)
+- Mitigação: APIs servem dados de Silver para relatórios em tempo real quando necessário
+
+**Confiabilidade vs. Custo:**
+- Decisão: Usar Kafka em ambiente restrito (pode ser substituído por filas simples)
+- Trade-off: Fila simples é menos resiliente, mas reduz custos
+- Mitigação: Implementar retry logic e dead-letter queues em produção
+
+**Reversibilidade:**
+- Dados em Bronze são imutáveis (append-only), permitindo recriação de Silver/Gold a qualquer momento
+- Decisões de tecnologia (Spark vs. Pandas, Kafka vs. Fila) podem ser alteradas sem perder dados
+- Scripts de transformação são versionados para rastreabilidade
+
+
+4.5. Tecnologias Utilizadas e Justificativas
+
+Ingestão  
+- FastAPI: Framework assíncrono de alta performance para Python, ideal para APIs REST que recebem requisições de múltiplos clientes. Integra-se facilmente com ferramentas de logging e validação (Pydantic).
+- Kafka (ou alternativa simplificada): Sistema de fila distribuído que captura eventos em tempo real com garantia de entrega. Em ambiente acadêmico restrito, pode ser substituído por RabbitMQ ou até filas em memória (Redis).
+
+Armazenamento  
+- PostgreSQL: Banco relacional robusto com ACID compliance, ideal para dados transacionais estruturados. Permite consultas complexas e manutenção de integridade referencial.
+- Amazon S3 (ou armazenamento local): Armazenamento de objetos escalável para dados brutos (Bronze Layer). Em ambientes locais, usa-se filesystem ou MinIO (S3 compatível).
+
+Processamento e Transformação  
+- Pandas (principal): Biblioteca Python leve e intuitiva, adequada para volumes iniciais (até alguns GB). Integra-se perfeitamente com Jupyter para exploração e validação de dados.
+- Apache Spark (opcional): Framework distribuído para processamento de grandes volumes. Será utilizado se o volume de dados exceder capacidade de Pandas ou para paralelizar transformações.
+- dbt (Data Build Tool): Ferramenta de versionamento e orquestração de transformações SQL, garante reprodutibilidade e facilita documentação das métricas.
+
+Orquestração  
+- Scripts agendados (cron/scheduler nativo): Simples e direto para pipelines iniciais com frequência regular (ex.: exportação noturna do PostgreSQL).
+- Apache Airflow (opcional): Orquestrador com interface web, histórico de execuções e tratamento de dependências. Recomendado quando pipelines se tornarem complexos.
+
+Servir Dados / Consumo  
+- Power BI: Ferramenta de BI com interface intuitiva para dashboards. Conecta-se diretamente a PostgreSQL ou à camada Gold, permitindo visualizações interativas.
+- API REST (FastAPI): Expõe dados do Gold Layer para consumo por aplicações externas (ex.: recomendações em tempo real na plataforma).
+
+Justificativa Geral  
+As tecnologias foram selecionadas priorizando integração com Python (consistência de stack), facilidade de implementação em ambiente acadêmico, escalabilidade futura (arquitetura preparada para Spark/BigQuery sem refatoração) e viabilidade com recursos limitados (Pandas, cron, armazenamento local).
+
+Correntes do Ciclo de Vida:
+
+**Segurança:**
+- Autenticação: OAuth 2.0 na API FastAPI
+- Autorização: Role-based access control (RBAC) por domínio
+- Dados sensíveis (emails, localização): Criptografia em repouso no PostgreSQL
+- Credenciais: Armazenadas em variáveis de ambiente, nunca em código
+- Auditoria: Logging de todas as operações em arquivo imutável
+
+**Gestão de Dados:**
+- Catálogo de dados: Documentação de cada tabela/evento com proprietário, SLA e linhagem
+- Qualidade: Validações no Silver Layer (schema, valores nulos, anomalias)
+- Retenção: Política de 12 meses em Bronze (compactação automática após 3 meses)
+- Linhagem: Rastreamento de transformações de Bronze → Silver → Gold
+
+**DataOps:**
+- Versionamento: Código de transformação em Git com CI/CD para validar sintaxe
+- Testes: Testes unitários para scripts Pandas/Spark, validação de schemas no Silver
+- Monitoramento: Alertas configurados para falhas de ingestão, latência de processamento > 5 min
+
+**Monitoramento e Observabilidade:**
+- Logs: Estruturados em JSON, centralizados com ELK Stack ou CloudWatch
+- Métricas: Prometheus para rastrear volume de eventos ingeridos, tempo de processamento
+- Alertas: Disparados se taxa de erro > 1% ou latência > SLA definido
+- Dashboards: Painel interno (Grafana) mostrando saúde dos pipelines
+
+**Governança de Dados:**
+- Conformidade: Cumprimento de LGPD (direito ao esquecimento, consentimento)
+- Mascaramento: Dados pessoais mascarados em ambientes de dev/test
+- Política de acesso: Aprovação para acessar dados sensíveis (portfólios, localização)
+- Documentação: Dicionário de dados com glossário de negócio e responsáveis
+
+
+4.6. Considerações de Viabilidade
+
+Para garantir a execução prática do projeto em ambiente acadêmico com recursos limitados, as seguintes substituições são permitidas e recomendadas:
+
+- Kafka → RabbitMQ, Redis Streams ou Python Queue (fila em memória)
+- Spark → Pandas com multiprocessing
+- S3 → Armazenamento local (filesystem) ou MinIO
+- Airflow → Agendador nativo do SO (cron em Linux/Mac, Task Scheduler no Windows)
+- Power BI → Metabase, Superset ou Grafana (open-source)
+
+Essas adaptações garantem execução em máquina local sem sacrificar os conceitos fundamentais da arquitetura Lakehouse.
+
+Cronograma Recomendado:
+- Semana 1-2: Configuração do PostgreSQL e API FastAPI
+- Semana 3-4: Implementação do pipeline Bronze-Silver-Gold com Pandas
+- Semana 5: Integração com Power BI/Superset
+- Semana 6: Testes de qualidade e otimizações
+
+
+4.6. Considerações Finais
+
+4.6.1. Riscos e Limitações
+
+Riscos Técnicos:
+- Escalabilidade com crescimento de usuários: Volume pode exceder capacidade de Pandas; mitigação: planejar migração para Spark
+- Alto volume de imagens em portfólios: Requer otimização de armazenamento (compressão, CDN); mitigação: implementar processamento de imagens com Pillow
+- Latência de batch: Agregações noturnas podem não ser suficientes; mitigação: implementar streaming em paralelo
+- Disponibilidade do banco de dados: PostgreSQL único ponto de falha; mitigação: backup automático, replicação em produção
+
+Riscos de Negócio:
+- Baixa adoção inicial da plataforma: Pode resultar em dados insuficientes para análises; mitigação: usar dados sintéticos para testes
+- Complexidade da arquitetura: Time de desenvolvimento pequeno pode ter dificuldade em manter; mitigação: documentação completa e scripts automatizados
+
+Limitações Conhecidas:
+- Ambiente acadêmico: Sem acesso a recursos em nuvem premium (BigQuery, Redshift)
+- Performance inicial: Pandas é sequencial; transformações complexas podem levar minutos
+- Falta de ML avançado: Recomendações iniciais são simples (content-based); modelos complexos demandam infraestrutura adicional
+
+Estratégia de Mitigação:
+- Testes contínuos de performance
+- Monitoramento de latência e volume
+- Documentação de limitações e plano de upgrade
+- Preparação modular da arquitetura para evolução
+
+
+4.6.2. Próximos Passos (Parte 2 do Projeto)
+
+Fase de Implementação:
+
+1. Infraestrutura Base:
+   - Configurar PostgreSQL com schema relacional para usuários, tatuadores, estilos, portfólios, avaliações
+   - Implementar API FastAPI com endpoints CRUD para todas as entidades
+   - Configurar autenticação OAuth 2.0
+
+2. Ingestão de Dados:
+   - Implementar produtor de eventos na aplicação web/mobile
+   - Configurar fila de mensagens (Kafka ou alternativa)
+   - Criar script de ingestão em Bronze Layer
+
+3. Pipeline de Transformação:
+   - Implementar validações e limpeza em Silver Layer (Pandas)
+   - Criar agregações em Gold Layer (métricas KPI)
+   - Configurar orquestração com cron ou Airflow
+
+4. Consumo e BI:
+   - Conectar Power BI/Superset ao Gold Layer
+   - Criar dashboards para negócio (tatuadores mais visualizados, estilos populares)
+   - Expor API de dados para recomendações na plataforma
+
+5. Testes e Otimização:
+   - Testes de carga no pipeline (validar SLA de latência)
+   - Otimizar queries no PostgreSQL (índices, particionamento)
+   - Documentar lições aprendidas
+
+4.6.3. Referências Bibliográficas
+
+[1] Databricks. "What is a Lakehouse?" Disponível em: https://databricks.com/blog/2020/01/30/what-is-a-data-lakehouse.html
+
+[2] Kimball, R., & Ross, M. (2013). "The Data Warehouse Toolkit: The Definitive Guide to Dimensional Modeling" (3ª ed.). Wiley.
+
+[3] Lambda Architecture. "Lambda Architecture" - Docs. Disponível em: http://lambda-architecture.net/
+
+[4] Apache Kafka Documentation. "Apache Kafka: A Distributed Streaming Platform". Disponível em: https://kafka.apache.org/documentation/
+
+[5] FastAPI Documentation. "FastAPI - Build APIs with Python". Disponível em: https://fastapi.tiangolo.com/
+
+[6] pandas Documentation. "pandas - Python Data Analysis Library". Disponível em: https://pandas.pydata.org/
+
+[7] Apache Spark Documentation. "Apache Spark - Lightning-fast unified analytics engine". Disponível em: https://spark.apache.org/docs/
+
+[8] dbt Documentation. "dbt - Data Build Tool". Disponível em: https://docs.getdbt.com/
+
+[9] Apache Airflow Documentation. "Apache Airflow - Workflow Orchestration Platform". Disponível em: https://airflow.apache.org/docs/
+
+[10] Gamma, E., Helm, R., Johnson, R., & Vlissides, J. (1994). "Design Patterns: Elements of Reusable Object-Oriented Software". Addison-Wesley.
+
+[11] ISO/IEC 27001:2022. "Information security management systems - Requirements". International Organization for Standardization.
+
+[12] LGPD - Lei Geral de Proteção de Dados. Lei nº 13.709/2018, Brasil.
+
+[13] Thayyullathaan, S. (2019). "Big Data Architecture Patterns and Best Practices". Disponível em: Medium.
+
+[14] Chen, A. (2020). "The Medallion Architecture: Best Practices for Data Lakehouse". Disponível em: Databricks Blog.
+
+[15] Power BI Documentation. "Power BI Documentation and Learning". Disponível em: https://learn.microsoft.com/en-us/power-bi/
+
