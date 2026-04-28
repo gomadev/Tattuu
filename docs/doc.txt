@@ -282,7 +282,9 @@ Correntes do Ciclo de Vida:
 - Documentação: Dicionário de dados com glossário de negócio e responsáveis
 
 
-4.6. Considerações de Viabilidade
+4.6. Considerações Finais
+
+4.6.1. Considerações de Viabilidade
 
 Para garantir a execução prática do projeto em ambiente acadêmico com recursos limitados, as seguintes substituições são permitidas e recomendadas:
 
@@ -300,10 +302,9 @@ Cronograma Recomendado:
 - Semana 5: Integração com Power BI/Superset
 - Semana 6: Testes de qualidade e otimizações
 
+4.6.2. Riscos e Limitações
 
-4.6. Considerações Finais
-
-4.6.1. Riscos e Limitações
+4.6.2. Riscos e Limitações
 
 Riscos Técnicos:
 - Escalabilidade com crescimento de usuários: Volume pode exceder capacidade de Pandas; mitigação: planejar migração para Spark
@@ -327,7 +328,7 @@ Estratégia de Mitigação:
 - Preparação modular da arquitetura para evolução
 
 
-4.6.2. Próximos Passos (Parte 2 do Projeto)
+4.6.3. Próximos Passos (Parte 2 do Projeto)
 
 Fase de Implementação:
 
@@ -356,7 +357,7 @@ Fase de Implementação:
    - Otimizar queries no PostgreSQL (índices, particionamento)
    - Documentar lições aprendidas
 
-4.6.3. Referências Bibliográficas
+4.6.4. Referências Bibliográficas
 
 [1] Databricks. "What is a Lakehouse?" Disponível em: https://databricks.com/blog/2020/01/30/what-is-a-data-lakehouse.html
 
