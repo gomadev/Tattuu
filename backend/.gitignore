@@ -1,10 +1,5 @@
-# Git
-.git
-.gitignore
-.gitattributes
-
 # Python
-__pycache__
+__pycache__/
 *.py[cod]
 *$py.class
 *.so
@@ -24,20 +19,21 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Virtual environments
 venv/
 ENV/
 env/
 .venv
 
 # IDE
-.vscode
-.idea
+.vscode/
+.idea/
 *.swp
 *.swo
 *~
-.DS_Store
 
-# Environment
+# Environment variables
 .env
 .env.local
 
@@ -46,7 +42,7 @@ env/
 *.sqlite
 *.sqlite3
 
-# Data
+# Data Lake
 data_lake/
 *.parquet
 
@@ -54,16 +50,7 @@ data_lake/
 *.log
 logs/
 
-# Testing
-.pytest_cache
+# Cache
+.pytest_cache/
 .coverage
 htmlcov/
-
-# Documentation
-docs/
-*.md
-README.md
-
-# Node (if any)
-node_modules/
-package-lock.json
