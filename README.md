@@ -1,6 +1,6 @@
 # Tattuu — Plataforma de Descoberta de Tatuadores
 
-Projeto acadêmico de Engenharia de Dados desenvolvido com arquitetura Lakehouse (Modelo Medalhão) para centralizar tatuadores profissionais e facilitar descoberta baseada em estilo, localização e avaliações.
+Projeto acadêmico de Engenharia de Dados desenvolvido com arquitetura Lakehouse (Modelo Medalhão) para centralizar tatuadores profissionais e facilitar a descoberta baseada em estilo, localização, portfólio e avaliações.
 
 ## Descrição do Projeto
 
@@ -9,6 +9,29 @@ O Tattuu é uma plataforma digital que conecta usuários finais com tatuadores p
 - Visualização de portfólios de tatuadores
 - Sistema de avaliações e comentários
 - Análise de dados de interação para recomendações personalizadas
+
+### Escopo e Dados
+
+O projeto trabalha com dois grupos principais de dados:
+
+- **Dados operacionais**: cadastro de usuários, tatuadores, estilos, portfólios, favoritos e avaliações, persistidos em PostgreSQL (provável escolha).
+- **Dados de streaming**: eventos de busca, clique, visualização e atualização de perfil, produzidos em tempo real para análise comportamental.
+
+Essa separação permite combinar consistência transacional no núcleo da aplicação com análise analítica sobre eventos de uso.
+
+### Domínios e Serviços
+
+- **Usuários**: cadastro, autenticação, perfil, histórico e favoritos.
+- **Tatuadores**: cadastro profissional, portfólio, estilos e localização.
+- **Busca**: filtros por estilo, localização e ordenação de resultados.
+- **Analytics**: coleta de eventos, métricas, relatórios e recomendações.
+
+Serviços compartilhados:
+
+- Autenticação e autorização
+- Armazenamento de mídia
+- Logging e monitoramento
+- Publicação/consumo de eventos
 
 ## Arquitetura
 
@@ -23,7 +46,7 @@ O projeto implementa uma arquitetura **Lakehouse** baseada no **modelo Medalhão
 ### Fluxo de Dados
 
 ```
-Aplicação → API FastAPI → PostgreSQL (operacional) + Kafka (eventos)
+Aplicação → API FastAPI → PostgreSQL (camada operacional, provável escolha) + Kafka (eventos)
      ↓
   Bronze Layer (S3/armazenamento local)
      ↓
@@ -36,8 +59,15 @@ Aplicação → API FastAPI → PostgreSQL (operacional) + Kafka (eventos)
 
 ### Caminhos de Processamento
 
-- **Batch**: Exportação diária de PostgreSQL para Bronze, processamento noturno (Silver → Gold)
+- **Batch**: Exportação diária de PostgreSQL (provável base operacional) para Bronze, processamento noturno (Silver → Gold)
 - **Streaming**: Ingestão contínua de eventos via Kafka, processamento em janelas de 5 minutos
+
+### Justificativa da Arquitetura
+
+- **Bronze** preserva o dado bruto para rastreabilidade e reprocessamento.
+- **Silver** aplica limpeza, padronização e validação para reduzir ruído.
+- **Gold** concentra dados prontos para leitura analítica e consumo por dashboards ou recomendações.
+- A combinação de batch e streaming reduz latência sem perder confiabilidade na persistência operacional.
 
 Para detalhes completos, consulte [Documento de Arquitetura](docs/doc.txt).
 
@@ -83,26 +113,42 @@ tatt-oo/
 
 ## Tecnologias
 
-### Backend
-- **FastAPI**: Framework REST assíncrono para Python
-- **SQLAlchemy**: ORM para gerenciamento de banco de dados
-- **Pydantic**: Validação de dados e schemas
-- **PostgreSQL**: Banco de dados relacional
-- **Kafka**: Fila de mensagens para eventos (opcional)
-- **Pandas**: Processamento de dados (Silver/Gold layers)
-- **pytest**: Framework de testes
+### Ingestão
+
+- **FastAPI**: expõe a API e recebe os dados transacionais e eventos da aplicação.
+- **Kafka**: desacopla a geração de eventos do processamento analítico em tempo real.
+
+### Armazenamento
+
+- **PostgreSQL**: provável banco relacional para garantir consistência transacional das entidades operacionais.
+- **Armazenamento de Bronze**: mantém dados brutos para auditoria e reprocessamento.
+
+### Processamento
+
+- **Pandas**: adequado para as transformações iniciais do pipeline Silver/Gold em ambiente acadêmico.
+- **SQLAlchemy**: organiza o acesso aos dados e mantém o código desacoplado do banco.
+
+### Validação e Contratos
+
+- **Pydantic**: valida entradas e saídas da API com schemas explícitos.
+- **pytest**: apoia validações básicas do comportamento da aplicação.
+
+### Consumo
+
+- **React**: interface para navegação, busca e consumo dos dados operacionais.
+- **Vite**: entrega um ambiente rápido de desenvolvimento e build para o frontend.
+
+### Infraestrutura e Governança
+
+- **Docker** e **Docker Compose**: padronizam execução local e ambiente reprodutível.
+- **Prometheus** e **Grafana**: suportam observabilidade.
+- **Adminer**: facilita inspeção do banco relacional, provavelmente PostgreSQL, durante desenvolvimento.
 
 ### Frontend
+
 - **React**: Biblioteca de UI
 - **TypeScript**: Tipagem estática em JavaScript
 - **Vite**: Build tool moderno
-
-### Infraestrutura
-- **Docker**: Containerização
-- **Docker Compose**: Orquestração multi-container
-- **Prometheus**: Coleta de métricas
-- **Grafana**: Visualização de métricas
-- **Adminer**: Interface para PostgreSQL
 
 ## Pré-requisitos
 
@@ -128,7 +174,7 @@ Os serviços estarão disponíveis em:
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:8000
 - Documentação API: http://localhost:8000/docs
-- PostgreSQL: localhost:5432 (via Adminer em http://localhost:8081)
+- PostgreSQL: localhost:5432 (provável porta do banco relacional, via Adminer em http://localhost:8081)
 - Prometheus: http://localhost:9090
 - Grafana: http://localhost:3000 (admin/admin)
 
@@ -221,5 +267,9 @@ npm run dev
 ### Backend
 
 ```bash
-fazendo
+cd backend
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
 ```
