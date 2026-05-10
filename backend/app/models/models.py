@@ -15,7 +15,6 @@ artist_styles = Table(
 
 
 class User(Base):
-    """Modelo de usuário cliente."""
     __tablename__ = "users"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -31,7 +30,6 @@ class User(Base):
 
 
 class Artist(Base):
-    """Modelo de tatuador profissional."""
     __tablename__ = "artists"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -53,7 +51,6 @@ class Artist(Base):
 
 
 class Style(Base):
-    """Modelo de estilo de tatuagem."""
     __tablename__ = "styles"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -65,7 +62,6 @@ class Style(Base):
 
 
 class Portfolio(Base):
-    """Modelo de item no portfólio do tatuador."""
     __tablename__ = "portfolios"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -81,7 +77,6 @@ class Portfolio(Base):
 
 
 class Rating(Base):
-    """Modelo de avaliação/comentário de tatuador."""
     __tablename__ = "ratings"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -96,7 +91,6 @@ class Rating(Base):
 
 
 class Favorite(Base):
-    """Modelo de tatuador favorito."""
     __tablename__ = "favorites"
     
     user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)

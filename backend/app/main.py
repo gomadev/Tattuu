@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
-from app.routes import users, artists
+from app.routes import users, artists, portfolios, ratings, favorites, search
 from app.database import Base, engine
 
 Base.metadata.create_all(bind=engine)
@@ -30,11 +30,26 @@ app.include_router(
     artists.router,
     prefix=settings.API_V1_STR,
 )
+app.include_router(
+    portfolios.router,
+    prefix=settings.API_V1_STR,
+)
+app.include_router(
+    ratings.router,
+    prefix=settings.API_V1_STR,
+)
+app.include_router(
+    favorites.router,
+    prefix=settings.API_V1_STR,
+)
+app.include_router(
+    search.router,
+    prefix=settings.API_V1_STR,
+)
 
 
 @app.get("/")
 def read_root():
-    """Endpoint raiz."""
     return {
         "message": "Tattuu API",
         "version": "1.0.0",
@@ -44,7 +59,6 @@ def read_root():
 
 @app.get("/health")
 def health_check():
-    """Health check da API."""
     return {
         "status": "healthy",
         "service": "tattuu-api"

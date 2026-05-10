@@ -1,7 +1,7 @@
 """Configuração de fixtures e testes."""
 import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from app.database import Base
 from app.main import app
 from fastapi.testclient import TestClient
@@ -14,14 +14,12 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 
 @pytest.fixture(scope="function")
-def db():
-    """Cria banco de dados de teste."""
+def db() -> Session:
     Base.metadata.create_all(bind=engine)
     yield TestingSessionLocal()
     Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture(scope="function")
-def client():
-    """Cria cliente de teste."""
+def client() -> TestClient:
     return TestClient(app)

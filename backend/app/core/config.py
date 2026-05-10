@@ -5,7 +5,6 @@ import os
 
 
 class Settings(BaseSettings):
-    """Configurações carregadas de variáveis de ambiente."""
     
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "Tattuu API"
@@ -48,5 +47,7 @@ class Settings(BaseSettings):
 
 @lru_cache()
 def get_settings() -> Settings:
-    """Retorna instância em cache das configurações."""
     return Settings()
+
+
+settings = get_settings()

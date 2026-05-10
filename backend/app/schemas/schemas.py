@@ -1,7 +1,7 @@
 """Esquemas Pydantic para validação de requisições e respostas."""
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional
 
 
 class UserBase(BaseModel):
@@ -12,6 +12,17 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+
+
+class UserLogin(BaseModel):
+    username: str = Field(..., description="Email ou username")
+    password: str = Field(..., min_length=1)
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user_id: int
 
 
 class UserResponse(UserBase):
@@ -45,11 +56,11 @@ class ArtistBase(BaseModel):
 
 class ArtistCreate(ArtistBase):
     user_id: int
-    style_ids: Optional[List[int]] = []
+    style_ids: Optional[list[int]] = []
 
 
 class ArtistUpdate(ArtistBase):
-    style_ids: Optional[List[int]] = None
+    style_ids: Optional[list[int]] = None
 
 
 class ArtistResponse(ArtistBase):
@@ -58,15 +69,15 @@ class ArtistResponse(ArtistBase):
     rating: float
     total_ratings: int
     created_at: datetime
-    styles: List[StyleResponse] = []
+    styles: list[StyleResponse] = []
     
     class Config:
         from_attributes = True
 
 
 class ArtistDetailResponse(ArtistResponse):
-    portfolios: List['PortfolioResponse'] = []
-    ratings: List['RatingResponse'] = []
+    portfolios: list['PortfolioResponse'] = []
+    ratings: list['RatingResponse'] = []
 
 
 class PortfolioBase(BaseModel):
@@ -110,7 +121,7 @@ class RatingResponse(RatingBase):
 
 
 class EventBase(BaseModel):
-    """Evento de usuário para ingestão em Data Lake."""
+
     event_type: str
     user_id: Optional[int] = None
     artist_id: Optional[int] = None

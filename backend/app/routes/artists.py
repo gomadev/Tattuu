@@ -4,14 +4,12 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.models import Artist, Style, User
 from app.schemas.schemas import ArtistCreate, ArtistResponse, ArtistDetailResponse, ArtistUpdate
-from typing import List
 
 router = APIRouter(prefix="/artists", tags=["artists"])
 
 
 @router.post("/", response_model=ArtistResponse, status_code=status.HTTP_201_CREATED)
-def create_artist(artist: ArtistCreate, db: Session = Depends(get_db)):
-    """Cria novo perfil de tatuador."""
+def create_artist(artist: ArtistCreate, db: Session = Depends(get_db)) -> ArtistResponse:
     user = db.query(User).filter(User.id == artist.user_id).first()
     if not user:
         raise HTTPException(
@@ -39,15 +37,14 @@ def create_artist(artist: ArtistCreate, db: Session = Depends(get_db)):
     return db_artist
 
 
-@router.get("/", response_model=List[ArtistResponse])
+@router.get("/", response_model=list[ArtistResponse])
 def list_artists(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
     style_id: int = Query(None),
     location: str = Query(None),
     db: Session = Depends(get_db)
-):
-    """Lista tatuadores com filtros opcionais por estilo ou localização."""
+) -> list[ArtistResponse]:
     query = db.query(Artist)
     
     if style_id:
@@ -60,8 +57,7 @@ def list_artists(
 
 
 @router.get("/{artist_id}", response_model=ArtistDetailResponse)
-def get_artist(artist_id: int, db: Session = Depends(get_db)):
-    """Recupera informações detalhadas de um tatuador."""
+def get_artist(artist_id: int, db: Session = Depends(get_db)) -> ArtistDetailResponse:
     artist = db.query(Artist).filter(Artist.id == artist_id).first()
     
     if not artist:
@@ -78,8 +74,7 @@ def update_artist(
     artist_id: int,
     artist_update: ArtistUpdate,
     db: Session = Depends(get_db)
-):
-    """Atualiza perfil do tatuador."""
+) -> ArtistResponse:
     artist = db.query(Artist).filter(Artist.id == artist_id).first()
     
     if not artist:

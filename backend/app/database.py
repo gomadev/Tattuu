@@ -16,7 +16,6 @@ Base = declarative_base()
 
 
 def get_db():
-    """Dependência para injeção de sessão do banco de dados."""
     db = SessionLocal()
     try:
         yield db
