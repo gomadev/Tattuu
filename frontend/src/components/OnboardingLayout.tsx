@@ -39,7 +39,7 @@ export function OnboardingLayout({
   const hasSubtitleInput = typeof onSubtitleInputChange === 'function';
 
   return (
-    <main className="onboarding-screen onboarding-flow-screen">
+    <main className="onboarding-screen onboarding-flow-screen screen--fade screen--fade-in">
       <section className="onboarding-flow-content">
         <h1>
           {titleParts.map((part, index) => (
