@@ -24,3 +24,19 @@ Thumbs.db
 
 # typescript
 *.tsbuildinfo
+
+# documentation folder
+/docs/
+
+# IDE
+.idea/
+.vscode/settings.json
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.bak
+
+#txt
+prompt.txt

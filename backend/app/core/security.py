@@ -4,14 +4,13 @@ from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthCredentials
+from starlette.requests import Request
 from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.database import get_db
 
 settings = get_settings()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-security = HTTPBearer()
 
 
 def get_password_hash(password: str) -> str:
@@ -56,12 +55,21 @@ def decode_access_token(token: str) -> dict:
 
 
 async def get_current_user(
-    credentials: HTTPAuthCredentials = Depends(security),
+    request: Request,
     db: Session = Depends(get_db)
 ):
-    token = credentials.credentials
+    auth_header = request.headers.get("Authorization")
     
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token não fornecido",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    
+    token = auth_header.replace("Bearer ", "")
     payload = decode_access_token(token)
+    
     if payload is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
